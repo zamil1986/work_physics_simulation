@@ -56,10 +56,6 @@ class WorkSimulator:
 
         left_frame.bind("<Configure>", on_configure)
 
-        def _on_mousewheel(event):
-            canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
-
-        canvas.bind_all("<MouseWheel>", _on_mousewheel)
 
         #title
         title = tk.Label(
@@ -71,7 +67,7 @@ class WorkSimulator:
         )
         title.pack(pady=(0, 20))
 
-        #options
+        #pilihan gaya
         option_frame = tk.LabelFrame(
             left_frame,
             text="Jenis Gaya",
@@ -105,22 +101,25 @@ class WorkSimulator:
         # Panggon Input
         self.force_frame, self.force_label = self.create_input_field(
             left_frame, "Gaya(F)[N]:", self.force, 0, 100
-        )
+            )
+        
 
         self.disp_frame, self.disp_label = self.create_input_field(
             left_frame, "Perpindahan(d)[m]:", self.displacement, 0, 10
-        )
+            )
 
         self.angle_frame, self.angle_label = self.create_input_field(
             left_frame, "Sudut(θ)[°]:", self.angle, 0, 180
-        )
+            )
 
-        # Control buttons
-        btn_frame = tk.Frame(left_frame, bg="#ffffff")
-        btn_frame.pack(pady=20)
+      
+        #Play,Reset,Show Graph
+        self.btn_frame = tk.Frame(left_frame, bg="#ffffff")
+        self.btn_frame.pack(pady=20)
+
         
         self.animate_btn = tk.Button(
-            btn_frame,
+            self.btn_frame,
             text="Play",
             command=self.start_animation,
             font=("Arial", 12, "bold"),
@@ -133,7 +132,7 @@ class WorkSimulator:
         self.animate_btn.pack(pady=5, fill=tk.X)
         
         reset_btn = tk.Button(
-            btn_frame,
+            self.btn_frame,
             text="Reset",
             command=self.reset_animation,
             font=("Arial", 12, "bold"),
@@ -146,7 +145,7 @@ class WorkSimulator:
         reset_btn.pack(pady=5, fill=tk.X)
 
         graph_btn = tk.Button(
-            btn_frame,
+            self.btn_frame,
             text="Show Graph",
             command=self.show_graph,
             font=("Arial", 12, "bold"),
@@ -180,7 +179,7 @@ class WorkSimulator:
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
 
-        # Right Panel - Canvas for animation
+        # Canvas Animasi
         right_frame = tk.Frame(self.root, bg="#ffffff")
         right_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
@@ -202,23 +201,26 @@ class WorkSimulator:
         )
         self.canvas.pack()
 
-        # Configure grid weights
-        self.root.grid_rowconfigure(0, weight=1)
-        self.root.grid_columnconfigure(1, weight=1)
-
         # Initial calculation display
         self.update_calculation()
 
     def on_force_type_change(self):
         if self.force_type.get() == 1:
-            #KONSTAN
-            self.force_label.config(text="Gaya(F)[N]:")
-            self.angle_frame.pack(pady=10, fill=tk.X)
+            #GAYA KONSTAN
+            self.force_label.config(text="Force (F) [N]:")
+            self.disp_label.config(text="Perpindahan (d) [m]")
+            self.angle_frame.pack(
+                pady=10,
+                fill=tk.X,
+                before=self.btn_frame
+        )
+
             self.angle.set(30)
 
         else:
-            #PEGAS 
-            self.force_label.config(text="Konstanta Pegas(k)[N/m]:")
+        #PEGAS
+            self.force_label.config(text="Spring Constant (k) [N/m]:")
+            self.disp_label.config(text="Pertambahan Panjang Pegas (x) [m]")
             self.angle_frame.pack_forget()
             self.angle.set(0)
 
@@ -279,7 +281,6 @@ class WorkSimulator:
         return W, self.force.get(), d, theta_deg, theta_rad
 
     def update_calculation(self):
-        """Update the work calculation display"""
         W, F, d, theta_deg, theta_rad = self.calculate_work()
 
         # Clear and update result text
@@ -301,11 +302,9 @@ Nilai yang diberikan:
   F = {F:.2f} N
   d = {d:.2f} m
 
-Substitusi:
+Hitung:
   W = {F:.2f} × {d:.2f} × cos({theta_deg:.1f}°)
   W = {F:.2f} × {d:.2f} × {math.cos(theta_rad):.4f}
-
-Hasil:
   W = {W:.2f} J
 
 Komponen gaya:
@@ -313,7 +312,8 @@ Komponen gaya:
   Fy = F sin(θ) = {F * math.sin(theta_rad):.2f} N
 
 Teorema Usaha Energi:  
-𝐾𝐸final − 𝐾𝐸initial = ΔKE = Wtot(Usaha Total) = {W:.2f}
+    𝐾𝐸final − 𝐾𝐸initial = ΔKE
+     = Wtot(Usaha Total) = {W:.2f} J
 
 """
             self.result_text.insert(1.0, result)
@@ -334,17 +334,16 @@ Nilai yang diberikan:
   k = {F:.2f} N
   x = {d:.2f} m
 
-Substitusi:
+Hitung:
   W =  0.5 × {F:.2f} × ({d:.2f})²
-
-Hasil:
-  W = {W:.2f} J
-
+  W =  {W:.2f} J
+  
 Gaya yang diberikan:
   F = k * x = {F:.2f}*{d:.2f} = {F*d:.2f}
 
 Teorema Usaha-Energi:  
-ΔKE = Wnet(Usaha Total) = {W:.2f} J
+    𝐾𝐸final − 𝐾𝐸initial = ΔKE 
+    = Wtot(Usaha Total) = {W:.2f}
 
 """
             self.result_text.insert(1.0, result)
@@ -630,7 +629,7 @@ Teorema Usaha-Energi:
         graph_window = tk.Toplevel(self.root)
         graph_window.geometry("720x600")
 
-        fig, ax , = plt.subplots(figsize=(8, 6))
+        fig, ax = plt.subplots(figsize=(8, 6))
 
         d = self.displacement.get()
         F = self.force.get()
