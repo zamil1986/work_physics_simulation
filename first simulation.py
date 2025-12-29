@@ -30,10 +30,10 @@ class WorkSimulator:
         self.setup_gui()
 
     def setup_gui(self):
-        # panel kiri
+        #panel kiri
         left_container = tk.Frame(self.root, bg="#f0f0f0")
         left_container.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
-        # scroller
+        #scroller
         canvas = tk.Canvas(
             left_container, bg="#f0f0f0", highlightthickness=0, width=350
         )
@@ -690,7 +690,6 @@ Teorema Usaha-Energi:
         canvas = FigureCanvasTkAgg(fig, master=graph_window)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
 
 # Main execution
 if __name__ == "__main__":
