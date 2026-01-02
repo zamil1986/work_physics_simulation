@@ -61,7 +61,7 @@ class WorkSimulator:
         title = tk.Label(
             left_frame,
             text="Control Panel",
-            font=("Arial", 20, "bold"),
+            font=("Arial", 25, "bold"),
             bg="#ffffff",
             fg="#2c3e50",
         )
@@ -185,8 +185,8 @@ class WorkSimulator:
 
         canvas_label = tk.Label(
             right_frame,
-            text="Animasi & Visualisasi",
-            font=("Arial", 20, "bold"),
+            text="Canvas Visualisasi",
+            font=("Arial", 30, "bold"),
             bg="#ffffff",
         )
         canvas_label.pack(pady=(0, 10))
@@ -339,7 +339,8 @@ Hitung:
   W =  {W:.2f} J
   
 Gaya yang diberikan:
-  F = k * x = {F:.2f}*{d:.2f} = {F*d:.2f}
+  F = k * x = {F:.2f}*{d:.2f}
+    = {F*d:.2f}
 
 Teorema Usaha-Energi:  
     𝐾𝐸final − 𝐾𝐸initial = ΔKE 
