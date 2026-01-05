@@ -300,6 +300,7 @@ Keterangan:
 Nilai yang diberikan:
   F = {F:.2f} N
   d = {d:.2f} m
+  θ = {theta_deg:.1f}°
 
 Hitung:
   W = {F:.2f} × {d:.2f} × cos({theta_deg:.1f}°)
@@ -420,6 +421,18 @@ Teorema Usaha-Energi:
                 outline="#c0392b",
                 width=3,
             )
+            #menggambar garis lurus pertambahan panjang pegas\
+            self.draw_arrow(
+                self.canvas,
+                50,
+                y + 80,
+                50 + self.displacement.get() * 60,
+                y + 80,
+                color="#2980b9",
+                width=3,
+                text=f"x = {self.displacement.get():.2f} m",
+            )
+            
             self.draw_spring(wall_x, y, box_left)
 
             return
