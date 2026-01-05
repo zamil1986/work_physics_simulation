@@ -2,8 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import math
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #embed matplotlib in tkinter
-
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg #integrasi backend matplotlib in tkinter
 
 class WorkSimulator:
     #constructor
@@ -13,10 +12,10 @@ class WorkSimulator:
         self.root.geometry("1200x700")
         self.root.configure(bg="#f0f0f0")
 
-        #variable animasi awal
-        self.box_x = 50  # Starting position of the box
-        self.box_y = 300  # Vertical position (constant)
-        self.box_size = 40
+        #variable animasi inisiasi
+        self.box_x = 50  #Horizontal position of the box
+        self.box_y = 300  #Vertical position of the box
+        self.box_size = 40 
         self.animation_running = False
         self.animation_frame = 0
         self.total_frames = 60  # Smooth animation over 60 frames
@@ -33,6 +32,7 @@ class WorkSimulator:
         #panel kiri
         left_container = tk.Frame(self.root, bg="#f0f0f0")
         left_container.grid(row=0, column=0, sticky="nsew", padx=10, pady=10)
+
         #scroller
         canvas = tk.Canvas(
             left_container, bg="#f0f0f0", highlightthickness=0, width=350
@@ -55,7 +55,6 @@ class WorkSimulator:
             canvas.configure(scrollregion=canvas.bbox("all"))
 
         left_frame.bind("<Configure>", on_configure)
-
 
         #title
         title = tk.Label(
@@ -103,7 +102,7 @@ class WorkSimulator:
             left_frame, "Gaya(F)[N]:", self.force, 0, 100
             )
         
-
+        
         self.disp_frame, self.disp_label = self.create_input_field(
             left_frame, "Perpindahan(d)[m]:", self.displacement, 0, 10
             )
@@ -157,7 +156,7 @@ class WorkSimulator:
         )
         graph_btn.pack(pady=5, fill=tk.X)
 
-        # Results Information Box
+        #Results Information Box
         self.result_frame = tk.LabelFrame(
             left_frame,
             text="Kotak Hasil Hitung",
@@ -179,7 +178,7 @@ class WorkSimulator:
         )
         self.result_text.pack(fill=tk.BOTH, expand=True)
 
-        # Canvas Animasi
+        #Canvas Animasi
         right_frame = tk.Frame(self.root, bg="#ffffff")
         right_frame.grid(row=0, column=1, sticky="nsew", padx=10, pady=10)
 
@@ -218,7 +217,7 @@ class WorkSimulator:
             self.angle.set(30)
 
         else:
-        #PEGAS
+            #PEGAS
             self.force_label.config(text="Spring Constant (k) [N/m]:")
             self.disp_label.config(text="Pertambahan Panjang Pegas (x) [m]")
             self.angle_frame.pack_forget()
@@ -260,6 +259,7 @@ class WorkSimulator:
 
         return frame, label
 
+    #kalkulasi usaha
     def calculate_work(self):
         d = self.displacement.get()
 
@@ -274,7 +274,6 @@ class WorkSimulator:
             #PEGAS
             k = self.force.get()
             W = 0.5 * k * d**2
-
             theta_deg = 0
             theta_rad = 0
 
@@ -283,7 +282,7 @@ class WorkSimulator:
     def update_calculation(self):
         W, F, d, theta_deg, theta_rad = self.calculate_work()
 
-        # Clear and update result text
+        #hapus teks lama dan tampilkan hasil baru
         self.result_text.delete(1.0, tk.END)
         if self.force_type.get() == 1:
             result = f"""
@@ -331,7 +330,7 @@ Keterangan:
   x = Pertambahan panjang pegas (m)
 
 Nilai yang diberikan:
-  k = {F:.2f} N
+  k = {F:.2f} N/m
   x = {d:.2f} m
 
 Hitung:
@@ -349,12 +348,12 @@ Teorema Usaha-Energi:
 """
             self.result_text.insert(1.0, result)
 
-        # Redraw static vectors if not animating
+        #gambar ulang vektor jika animasi tidak berjalan
         if not self.animation_running:
             self.draw_vectors()
 
     def start_animation(self):
-        """Start the animation sequence"""
+        #mulai animasi
         if not self.animation_running:
             self.animation_running = True
             self.animation_frame = 0
@@ -362,22 +361,22 @@ Teorema Usaha-Energi:
             self.animate_btn.config(state=tk.DISABLED, bg="#95a5a6")
             self.animate()
 
+    #fungsi animasi
     def animate(self):
-        """Animate the box movement frame by frame"""
         if not self.animation_running:
             return
 
-        # Calculate displacement per frame
+        #hitung perpindahan per frame
         d = self.displacement.get()
         scale = 60  # pixels per meter
         total_pixels = d * scale
         pixels_per_frame = total_pixels / self.total_frames
 
-        # Update box position
+        #update posisi kotak
         self.box_x += pixels_per_frame
         self.animation_frame += 1
 
-        # Draw current frame
+        #gambar ulang vektor dan kotak
         self.draw_vectors()
 
         # Continue animation or finish
@@ -388,28 +387,27 @@ Teorema Usaha-Energi:
             self.animate_btn.config(state=tk.NORMAL, bg="#27ae60")
 
     def reset_animation(self):
-        """Reset animation to initial state"""
+        #reset animasi
         self.animation_running = False
         self.animation_frame = 0
         self.box_x = 50
         self.animate_btn.config(state=tk.NORMAL, bg="#27ae60")
         self.draw_vectors()
 
+    #fungsi menggambar vektor/kotak 
     def draw_vectors(self):
-        """Draw all vectors and the animated box on canvas"""
-        # ===== SPRING MODE =====
+        #mode pegas
         if self.force_type.get() == 2:
             self.canvas.delete("all")
-
             wall_x = 80
             y = self.box_y
 
-            # Wall
+            #tembok(saat pegas)
             self.canvas.create_rectangle(
                 wall_x - 15, y - 40, wall_x, y + 40, fill="#2c3e50"
             )
 
-            # Box
+            #kotak saat pegas
             box_left = self.box_x - self.box_size / 2
             box_right = self.box_x + self.box_size / 2
 
@@ -422,23 +420,16 @@ Teorema Usaha-Energi:
                 outline="#c0392b",
                 width=3,
             )
-
-            # Spring
             self.draw_spring(wall_x, y, box_left)
 
             return
 
         self.canvas.delete("all")
 
-        # Get current values
         F = self.force.get()
         d = self.displacement.get()
         theta_deg = self.angle.get()
         theta_rad = math.radians(theta_deg)
-
-        # Scaling factors
-        force_scale = 30  # pixels per Newton
-        displacement_scale = 60  # pixels per meter
 
         # Draw ground line
         self.canvas.create_line(
@@ -450,7 +441,7 @@ Teorema Usaha-Energi:
             width=3,
         )
 
-        # Draw the box (object being moved)
+        #menggambar kotak saat gaya konstan
         box_x1 = self.box_x - self.box_size / 2
         box_y1 = self.box_y - self.box_size / 2
         box_x2 = self.box_x + self.box_size / 2
@@ -462,10 +453,10 @@ Teorema Usaha-Energi:
         self.canvas.create_text(
             self.box_x, self.box_y, text="m", font=("Arial", 16, "bold"), fill="white"
         )
-
-        # Draw displacement vector (always horizontal, from start to current position)
+        
+        #gambar vektor perpindahan(warna biru) yang selalu horizontal
         start_x = 50
-        end_x = 50 + d * displacement_scale
+        end_x = 50 + d * 60 #60 pixel per meter
         self.draw_arrow(
             self.canvas,
             start_x,
@@ -477,8 +468,8 @@ Teorema Usaha-Energi:
             text=(f"d = {self.displacement.get():.2f} m"),
         )
 
-        # Draw force vector from box at angle θ
-        force_length = F * force_scale
+        #membuat tulisan vektor gaya
+        force_length = F * 30  #30 pixel per Newton
         force_end_x = self.box_x + force_length * math.cos(theta_rad)
         force_end_y = self.box_y - force_length * math.sin(theta_rad)
         if not self.animation_running:
@@ -493,8 +484,8 @@ Teorema Usaha-Energi:
                 text=(f"F = {self.force.get():.2f} N"),
             )
 
-        # Draw force components (dashed lines)
-        # Horizontal component: F cos(θ)
+        #panah komponen gaya
+        #horizontal component: F cos(θ)
         if not self.animation_running:
             fx_end = self.box_x + force_length * math.cos(theta_rad)
             self.canvas.create_line(
@@ -514,10 +505,15 @@ Teorema Usaha-Energi:
                 fill="#27ae60",
             )
 
-            # Vertical component: F sin(θ)
+            #vertical component: F sin(θ)
             fy_end = self.box_y - force_length * math.sin(theta_rad)
             self.canvas.create_line(
-                fx_end, self.box_y, fx_end, fy_end, fill="#f39c12", width=2, dash=(5, 3)
+                fx_end, 
+                self.box_y, 
+                fx_end, 
+                fy_end, 
+                fill="#f39c12", 
+                width=2, dash=(5, 3)
             )
             self.canvas.create_text(
                 fx_end + 50,
@@ -542,7 +538,7 @@ Teorema Usaha-Energi:
                     width=2,
                 )
 
-                # Angle label
+                #label θ
                 label_angle_rad = theta_rad / 2
                 label_x = self.box_x + 35 * math.cos(label_angle_rad)
                 label_y = self.box_y - 35 * math.sin(label_angle_rad)
@@ -554,7 +550,7 @@ Teorema Usaha-Energi:
                     fill="#9b59b6",
                 )
 
-                # Draw legend
+                #tulis keterangan θ
                 legend_y = 50
                 self.canvas.create_text(
                     350,
@@ -564,20 +560,9 @@ Teorema Usaha-Energi:
                     fill="#2c3e50",
                 )
 
-        # Draw coordinate system
-        self.canvas.create_line(
-            630, 550, 680, 550, arrow=tk.LAST, fill="#34495e", width=2
-        )
-        self.canvas.create_line(
-            630, 550, 630, 500, arrow=tk.LAST, fill="#34495e", width=2
-        )
-        self.canvas.create_text(690, 550, text="x", font=("Arial", 10, "bold"))
-        self.canvas.create_text(630, 490, text="y", font=("Arial", 10, "bold"))
-
+    #fungsi menggambar pegas
     def draw_spring(self, x1, y, x2, coils=12, amplitude=10, color="#8e44ad"):
-        """
-        Draw a horizontal spring from x1 to x2 at height y
-        """
+        #validasi posisi pegas 
         if x2 <= x1:
             return
 
@@ -590,6 +575,7 @@ Teorema Usaha-Energi:
 
         points.append((x1, y))
 
+        #buat titik-titik pegas
         for _ in range(coils * 2):
             x += step
             points.append((x, y + amplitude * direction))
@@ -597,6 +583,7 @@ Teorema Usaha-Energi:
 
         points.append((x2, y))
 
+        #gambar garis pegas
         for i in range(len(points) - 1):
             self.canvas.create_line(
                 points[i][0],
@@ -607,8 +594,8 @@ Teorema Usaha-Energi:
                 fill=color,
             )
 
-    def draw_arrow(self, canvas, x1, y1, x2, y2, color, width, text):
-        """Draw an arrow with label"""
+    #fungsi menggambar panah vektor
+    def draw_arrow(self, canvas,x1, y1, x2, y2, color, width, text):
         canvas.create_line(
             x1,
             y1,
@@ -619,14 +606,14 @@ Teorema Usaha-Energi:
             width=width,
             arrowshape=(12, 15, 5),
         )
-        # Label at midpoint
+        #label tengah panah
         mid_x, mid_y = (x1 + x2) / 2, (y1 + y2) / 2
         canvas.create_text(
             mid_x, mid_y - 20, text=text, font=("Arial", 12, "bold"), fill=color
         )
 
     def show_graph(self):
-        # Window Baru untuk grafik
+        #Window Baru untuk grafik
         graph_window = tk.Toplevel(self.root)
         graph_window.geometry("720x600")
 
@@ -641,7 +628,7 @@ Teorema Usaha-Energi:
         # Gaya Konstan
         if self.force_type.get() == 1:
             graph_window.title("Grafik Gaya(F) - Perpindahan(d)")
-            F *=angle
+            F *= angle
 
             x_vals = [0, d]
             F_vals = [F, F]
@@ -670,8 +657,7 @@ Teorema Usaha-Energi:
             work_text = f"W = {0.5*k*d*d:.2f} J"
             ax.set_xlabel("Pertambahan panjang pegas(x)[m]", fontsize=11)
 
-        # Peletakan 
-        
+        #naruh teks  
         ax.set_ylabel("Gaya(F)[N]", fontsize=11)
         ax.grid(True)
         ax.legend()
@@ -687,12 +673,12 @@ Teorema Usaha-Energi:
             bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.6),
         )
 
-        # Embed matplotlib into Tkinter
+        #embed matplotlib di tkinter
         canvas = FigureCanvasTkAgg(fig, master=graph_window)
         canvas.draw()
         canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-# Main execution
+#eksekutor
 if __name__ == "__main__":
     root = tk.Tk()
     app = WorkSimulator(root)
