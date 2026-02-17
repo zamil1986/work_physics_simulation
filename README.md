@@ -1,2 +1,2 @@
-# work_physics_simulation
-used for final physics assignments
+# Tech Stack
+Python with Tkinter and Math Library
